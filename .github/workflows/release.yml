@@ -54,8 +54,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+          IS_DISPATCH: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --title "web-ui-kit ${RELEASE_TAG}" --generate-notes
+            gh release upload "$RELEASE_TAG" dist-release/x0c-tokens-*.tgz dist-release/x0c-ui-*.tgz dist-release/SHA256SUMS --clobber
+          elif [ "$IS_DISPATCH" = "true" ] || [ "$(gh release view "$RELEASE_TAG" --json assets --jq '.assets | length')" = "0" ]; then
+            gh release upload "$RELEASE_TAG" dist-release/x0c-tokens-*.tgz dist-release/x0c-ui-*.tgz dist-release/SHA256SUMS --clobber
+          else
+            echo "Release ${RELEASE_TAG} already has immutable tarball assets; skipping overwrite."
           fi
-          gh release upload "$RELEASE_TAG" dist-release/x0c-tokens-*.tgz dist-release/x0c-ui-*.tgz dist-release/SHA256SUMS --clobber
