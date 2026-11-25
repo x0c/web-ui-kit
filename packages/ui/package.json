@@ -1,6 +1,6 @@
 {
   "name": "@x0c/ui",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "description": "Flat Monochrome React 19, Radix UI, and Tailwind CSS v4 primitives and admin console patterns",
   "type": "module",

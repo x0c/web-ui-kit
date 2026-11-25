@@ -36,60 +36,160 @@ import { EmptyRow } from './admin-shell'
 
 export type { ColumnDef, OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table'
 
-export interface DataTableToolbarProps {
+export interface SearchInputProps {
+  value: string
+  onChange: (value: string) => void
+  onSubmit?: () => void
+  onClear?: () => void
+  placeholder?: string
+  clearLabel?: string
+  className?: string
+}
+
+/** Compact toolbar search input (h-8, leading icon, clear button, Enter submit). */
+export function SearchInput({
+  value,
+  onChange,
+  onSubmit,
+  onClear,
+  placeholder = 'Search…',
+  clearLabel = 'Clear search',
+  className,
+}: SearchInputProps) {
+  return (
+    <div className={cn('relative w-full sm:w-64', className)}>
+      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && onSubmit) {
+            e.preventDefault()
+            onSubmit()
+          }
+        }}
+        placeholder={placeholder}
+        className="h-8 pr-8 pl-8 text-xs"
+      />
+      {value && (
+        <button
+          type="button"
+          aria-label={clearLabel}
+          onClick={() => {
+            onChange('')
+            onClear?.()
+          }}
+          className="absolute top-1/2 right-1 grid size-6 -translate-y-1/2 cursor-pointer place-items-center rounded-sm text-muted-foreground hover:text-foreground"
+        >
+          <X className="size-3.5" />
+        </button>
+      )}
+    </div>
+  )
+}
+
+export interface FilterSelectOption {
+  value: string
+  label: ReactNode
+}
+
+export interface FilterSelectProps {
+  value: string
+  onValueChange: (value: string) => void
+  options: FilterSelectOption[]
+  placeholder?: string
+  ariaLabel?: string
+  className?: string
+}
+
+/** Toolbar-aligned select filter (h-8, content-fitting on desktop, full width on mobile). */
+export function FilterSelect({
+  value,
+  onValueChange,
+  options,
+  placeholder,
+  ariaLabel,
+  className,
+}: FilterSelectProps) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger
+        size="sm"
+        aria-label={ariaLabel}
+        className={cn('h-8 w-full text-xs sm:w-auto sm:min-w-[124px] sm:max-w-[240px]', className)}
+      >
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((opt) => (
+          <SelectItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+
+export interface FilterBarProps {
   searchValue?: string
   onSearchChange?: (value: string) => void
+  onSearchSubmit?: () => void
+  onSearchClear?: () => void
   searchPlaceholder?: string
+  searchClearLabel?: string
+  searchInputClassName?: string
   left?: ReactNode
   right?: ReactNode
   className?: string
 }
 
-export function DataTableToolbar({
+/** Unified two-zone list filter toolbar keeping every inline input, select, and button at h-8 with gap-2. */
+export function FilterBar({
   searchValue,
   onSearchChange,
+  onSearchSubmit,
+  onSearchClear,
   searchPlaceholder = 'Search…',
+  searchClearLabel = 'Clear search',
+  searchInputClassName,
   left,
   right,
   className,
-}: DataTableToolbarProps) {
+}: FilterBarProps) {
   const showSearch = typeof onSearchChange === 'function'
   if (!showSearch && !left && !right) return null
 
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-2.5 border-b border-border px-4 py-3 sm:px-5',
+        'flex flex-wrap items-center justify-between gap-2.5 [&_[data-slot=button]]:h-8 [&_[data-slot=input]]:h-8 [&_[data-slot=input]]:text-xs [&_[data-slot=select-trigger]]:h-8 [&_[data-slot=select-trigger]]:text-xs',
         className,
       )}
     >
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
         {showSearch && (
-          <div className="relative w-full sm:w-64">
-            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={searchValue ?? ''}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={searchPlaceholder}
-              className="h-8 pr-7 pl-8 text-xs"
-            />
-            {searchValue && (
-              <button
-                type="button"
-                aria-label="Clear search"
-                onClick={() => onSearchChange('')}
-                className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
-              >
-                <X className="size-3.5" />
-              </button>
-            )}
-          </div>
+          <SearchInput
+            value={searchValue ?? ''}
+            onChange={onSearchChange}
+            onSubmit={onSearchSubmit}
+            onClear={onSearchClear}
+            placeholder={searchPlaceholder}
+            clearLabel={searchClearLabel}
+            className={searchInputClassName}
+          />
         )}
         {left}
       </div>
       {right && <div className="flex flex-wrap items-center gap-2">{right}</div>}
     </div>
   )
+}
+
+export type DataTableToolbarProps = FilterBarProps
+
+export function DataTableToolbar({ className, ...props }: DataTableToolbarProps) {
+  return <FilterBar {...props} className={cn('border-b border-border px-4 py-3 sm:px-5', className)} />
 }
 
 export interface DataTablePaginationProps<TData> {
@@ -202,9 +302,14 @@ export interface DataTableProps<TData> {
   pageSizeOptions?: number[]
   // Search
   searchable?: boolean
+  manualFiltering?: boolean
   searchValue?: string
   onSearchChange?: (value: string) => void
+  onSearchSubmit?: () => void
+  onSearchClear?: () => void
   searchPlaceholder?: string
+  searchClearLabel?: string
+  searchInputClassName?: string
   // Sorting
   manualSorting?: boolean
   sorting?: SortingState
@@ -234,9 +339,14 @@ export function DataTable<TData>({
   initialPageSize = 20,
   pageSizeOptions = [10, 20, 50, 100],
   searchable = true,
+  manualFiltering = false,
   searchValue: controlledSearch,
   onSearchChange,
+  onSearchSubmit,
+  onSearchClear,
   searchPlaceholder = 'Search…',
+  searchClearLabel = 'Clear search',
+  searchInputClassName,
   manualSorting = false,
   sorting: controlledSorting,
   onSortingChange,
@@ -264,6 +374,7 @@ export function DataTable<TData>({
   const setSorting = onSortingChange ?? setInternalSorting
 
   const totalServer = rowCount ?? data.length
+  const skipClientFilter = manualPagination || manualFiltering
   const pageCount = manualPagination
     ? Math.max(1, Math.ceil(totalServer / Math.max(1, pagination.pageSize)))
     : undefined
@@ -277,13 +388,17 @@ export function DataTable<TData>({
     state: {
       pagination,
       sorting,
-      ...(manualPagination ? {} : { globalFilter: search }),
+      ...(skipClientFilter ? {} : { globalFilter: search }),
     },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
-    ...(manualPagination ? {} : { onGlobalFilterChange: setSearch }),
+    ...(skipClientFilter ? {} : { onGlobalFilterChange: setSearch }),
     getCoreRowModel: getCoreRowModel(),
-    ...(manualPagination ? { manualPagination: true, pageCount, rowCount: totalServer } : { getPaginationRowModel: getPaginationRowModel(), getFilteredRowModel: getFilteredRowModel() }),
+    ...(manualPagination
+      ? { manualPagination: true, pageCount, rowCount: totalServer }
+      : skipClientFilter
+        ? { getPaginationRowModel: getPaginationRowModel() }
+        : { getPaginationRowModel: getPaginationRowModel(), getFilteredRowModel: getFilteredRowModel() }),
     ...(manualSorting ? { manualSorting: true } : { getSortedRowModel: getSortedRowModel() }),
   })
 
@@ -295,7 +410,11 @@ export function DataTable<TData>({
       <DataTableToolbar
         searchValue={searchable ? search : undefined}
         onSearchChange={searchable ? setSearch : undefined}
+        onSearchSubmit={onSearchSubmit}
+        onSearchClear={onSearchClear}
         searchPlaceholder={searchPlaceholder}
+        searchClearLabel={searchClearLabel}
+        searchInputClassName={searchInputClassName}
         left={toolbarLeft}
         right={toolbarRight}
       />
