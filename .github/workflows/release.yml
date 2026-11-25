@@ -1,0 +1,71 @@
+name: Release Packages
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Tag or version to publish (e.g. v0.3.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: pnpm
+
+      - name: Ensure npm supports OIDC trusted publishing
+        run: npm install -g npm@^11.5.1
+
+      - name: Install and verify workspace
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+          pnpm run typecheck
+          pnpm run lint
+
+      - name: Publish @x0c/tokens and @x0c/ui
+        run: |
+          tokens_ver="$(node -p "require('./packages/tokens/package.json').version")"
+          ui_ver="$(node -p "require('./packages/ui/package.json').version")"
+
+          if npm view "@x0c/tokens@${tokens_ver}" version >/dev/null 2>&1; then
+            echo "skip @x0c/tokens@${tokens_ver} (already published)"
+          else
+            pnpm --filter @x0c/tokens publish --provenance --access public --no-git-checks
+          fi
+
+          for i in $(seq 1 24); do
+            if npm view "@x0c/tokens@${tokens_ver}" version >/dev/null 2>&1; then
+              break
+            fi
+            sleep 5
+          done
+
+          if npm view "@x0c/ui@${ui_ver}" version >/dev/null 2>&1; then
+            echo "skip @x0c/ui@${ui_ver} (already published)"
+          else
+            pnpm --filter @x0c/ui publish --provenance --access public --no-git-checks
+          fi

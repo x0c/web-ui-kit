@@ -1,0 +1,92 @@
+/*
+ * Flat Monochrome design tokens.
+ * Imported locally by @x0c/tokens/theme.css as a zero-FOUC baseline and overrideable via CSS custom properties.
+ */
+:root,
+:root[data-theme="light"] {
+  --brand: #111110;
+  --radius: 0.5rem;
+
+  --background: #ffffff;
+  --foreground: #111110;
+  --card: #ffffff;
+  --card-foreground: #111110;
+  --popover: #ffffff;
+  --popover-foreground: #111110;
+  --primary: #111110;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f2;
+  --secondary-foreground: #111110;
+  --muted: #f5f5f3;
+  --muted-foreground: #666662;
+  --accent: #f2f2ef;
+  --accent-foreground: #111110;
+  --destructive: #be2525;
+  --success: #16794c;
+  --warning: #a85d08;
+  --border: rgb(17 17 16 / 0.1);
+  --input: rgb(17 17 16 / 0.16);
+  --ring: rgb(17 17 16 / 0.18);
+  --brand-soft: rgb(17 17 16 / 0.055);
+  --brand-ink: #111110;
+  --shadow-popover: 0 4px 16px -4px rgb(17 17 16 / 0.08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --brand: #f4f4f2;
+    --background: #09090b;
+    --foreground: #f4f4f2;
+    --card: #111113;
+    --card-foreground: #f4f4f2;
+    --popover: #141416;
+    --popover-foreground: #f4f4f2;
+    --primary: #f4f4f2;
+    --primary-foreground: #09090b;
+    --secondary: #1b1b1e;
+    --secondary-foreground: #f4f4f2;
+    --muted: #161619;
+    --muted-foreground: #94949a;
+    --accent: #1d1d21;
+    --accent-foreground: #f4f4f2;
+    --destructive: #f06a6a;
+    --success: #46c989;
+    --warning: #eab354;
+    --border: rgb(255 255 255 / 0.1);
+    --input: rgb(255 255 255 / 0.16);
+    --ring: rgb(255 255 255 / 0.22);
+    --brand-soft: rgb(255 255 255 / 0.08);
+    --brand-ink: #f4f4f2;
+    --shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brand: #f4f4f2;
+  --background: #09090b;
+  --foreground: #f4f4f2;
+  --card: #111113;
+  --card-foreground: #f4f4f2;
+  --popover: #141416;
+  --popover-foreground: #f4f4f2;
+  --primary: #f4f4f2;
+  --primary-foreground: #09090b;
+  --secondary: #1b1b1e;
+  --secondary-foreground: #f4f4f2;
+  --muted: #161619;
+  --muted-foreground: #94949a;
+  --accent: #1d1d21;
+  --accent-foreground: #f4f4f2;
+  --destructive: #f06a6a;
+  --success: #46c989;
+  --warning: #eab354;
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.16);
+  --ring: rgb(255 255 255 / 0.22);
+  --brand-soft: rgb(255 255 255 / 0.08);
+  --brand-ink: #f4f4f2;
+  --shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+}

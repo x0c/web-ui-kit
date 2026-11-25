@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+*.tsbuildinfo
+*.tgz
+.env
+.env.*
+!.env.example
+AGENTS.md
+CLAUDE.md
+TASKBOARD.md

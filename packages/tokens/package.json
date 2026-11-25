@@ -1,0 +1,33 @@
+{
+  "name": "@x0c/tokens",
+  "version": "0.3.0",
+  "license": "MIT",
+  "description": "Flat Monochrome design tokens and Tailwind CSS v4 theme contract",
+  "type": "module",
+  "sideEffects": [
+    "./src/tokens.css",
+    "./src/theme.css",
+    "./src/fonts.css"
+  ],
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./theme.css": "./src/theme.css",
+    "./fonts.css": "./src/fonts.css"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/x0c/web-ui-kit.git",
+    "directory": "packages/tokens"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
