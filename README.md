@@ -6,20 +6,27 @@ Flat Monochrome React 19, Radix UI, and Tailwind CSS v4 design tokens (`@x0c/tok
 
 - **Zero runtime brand lock-in**: Neutral tokens and primitives out of the box, with an injectable `brand` slot on `AdminShell` and CSS custom properties for runtime theming.
 - **Proven headless primitives**: Built on Radix UI, `@tanstack/react-table` (`DataTable`), `cmdk` (`CommandPalette`), `sonner` (`Toaster`), and `lucide-react`.
+- **Self-contained GitHub Release tarballs**: Distributed directly from immutable GitHub Releases (no private registry auth, zero token setup, SHA-512 locked in `package-lock.json`).
 - **Opt-in webfonts**: `@x0c/ui/styles.css` ships only CSS tokens and utilities with clean system font fallbacks (ideal for single-binary `go:embed` consoles); import `@x0c/ui/fonts.css` when you want bundled Geist & Geist Mono variable fonts.
 
 ## Packages
 
 | Package | Purpose | Highlights |
 |---|---|---|
-| [`@x0c/tokens`](packages/tokens) | CSS custom properties & Tailwind v4 `@theme inline` | Light/Dark/System tokens (`./theme.css`), raw properties (`./tokens.css`), optional Geist fonts (`./fonts.css`). |
-| [`@x0c/ui`](packages/ui) | React 19 UI primitives & console patterns | `AdminShell`, `DataTable`, `CommandPalette`, `FormDialog`, `Sheet`, `ConfirmAction`, `SecretDialog`, `Notice`, `StatusDot`, Radix primitives, and `createAdminClient`. |
+| `@x0c/ui` | Self-contained React 19 UI primitives, console patterns & bundled tokens | `AdminShell`, `DataTable`, `CommandPalette`, `FormDialog`, `Sheet`, `ConfirmAction`, `SecretDialog`, `Notice`, `StatusDot`, Radix primitives, and `./styles.css` / `./fonts.css`. |
+| [`@x0c/tokens`](packages/tokens) | Standalone CSS custom properties & Tailwind v4 `@theme inline` | Light/Dark/System tokens (`./theme.css`), raw properties (`./tokens.css`), optional Geist fonts (`./fonts.css`). |
 
 ## Install
 
 ```bash
-npm install react react-dom lucide-react @x0c/ui
+npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-ui-0.3.0.tgz
 npm install -D @tailwindcss/vite tailwindcss typescript
+```
+
+For CSS-only tokens without React primitives:
+
+```bash
+npm install https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-tokens-0.3.0.tgz
 ```
 
 ## Usage

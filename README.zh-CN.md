@@ -6,20 +6,27 @@
 
 - **零品牌绑定**：开箱提供中性单色 Token 与通用组件；`AdminShell` 支持通过 `brand` 插槽注入自定义品牌标识，颜色与圆角支持通过 CSS 自定义属性覆盖。
 - **封装成熟无头原语**：基于 Radix UI、`@tanstack/react-table`（`DataTable`）、`cmdk`（`CommandPalette`）、`sonner`（`Toaster`）与 `lucide-react`。
+- **免鉴权 GitHub Release 压缩包分发**：直接从不可变 GitHub Release 安装（无需配置 npm 私有源或令牌，并由 `package-lock.json` 自动做 SHA-512 校验）。
 - **字体按需打包**：`@x0c/ui/styles.css` 仅包含 Token 与样式规则并回退至系统字体，适合保持 Go `go:embed` 单二进制体积精简；需要内置 Geist / Geist Mono 可变字体时再按需引入 `@x0c/ui/fonts.css`。
 
 ## 包含包
 
 | 包名 | 职责 | 说明 |
 |---|---|---|
-| [`@x0c/tokens`](packages/tokens) | CSS 变量与 Tailwind v4 `@theme inline` 契约 | 明暗/跟随系统配色 Token（`./theme.css`）、纯变量定义（`./tokens.css`）、可选 Geist 字体（`./fonts.css`）。 |
-| [`@x0c/ui`](packages/ui) | React 19 基础原语与控制台布局模式 | `AdminShell`、`DataTable`、`CommandPalette`、`FormDialog`、`Sheet`、`ConfirmAction`、`SecretDialog`、`Notice`、`StatusDot`、Radix 原语及 `createAdminClient`。 |
+| `@x0c/ui` | 自包含的 React 19 基础原语、控制台模式与内置 Token | `AdminShell`、`DataTable`、`CommandPalette`、`FormDialog`、`Sheet`、`ConfirmAction`、`SecretDialog`、`Notice`、`StatusDot`、Radix 原语，以及 `./styles.css` / `./fonts.css`。 |
+| [`@x0c/tokens`](packages/tokens) | 独立 CSS 变量与 Tailwind v4 `@theme inline` 契约 | 明暗/跟随系统配色 Token（`./theme.css`）、纯变量定义（`./tokens.css`）、可选 Geist 字体（`./fonts.css`）。 |
 
 ## 安装
 
 ```bash
-npm install react react-dom lucide-react @x0c/ui
+npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-ui-0.3.0.tgz
 npm install -D @tailwindcss/vite tailwindcss typescript
+```
+
+若仅需 CSS Token 而不引入 React 原语：
+
+```bash
+npm install https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-tokens-0.3.0.tgz
 ```
 
 ## 快速使用

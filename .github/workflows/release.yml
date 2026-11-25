@@ -1,4 +1,4 @@
-name: Release Packages
+name: Release Tarballs
 
 on:
   push:
@@ -7,16 +7,15 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Tag or version to publish (e.g. v0.3.0)"
+        description: "Tag to package and attach to its GitHub Release (e.g. v0.3.0)"
         required: true
         type: string
 
 permissions:
-  contents: read
-  id-token: write
+  contents: write
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,39 +32,30 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          registry-url: "https://registry.npmjs.org"
           cache: pnpm
 
-      - name: Ensure npm supports OIDC trusted publishing
-        run: npm install -g npm@^11.5.1
-
-      - name: Install and verify workspace
+      - name: Install, verify, and pack release tarballs
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: |
           pnpm install --frozen-lockfile
           pnpm run build
           pnpm run typecheck
           pnpm run lint
+          pnpm run build:playground
+          rm -rf dist-release && mkdir -p dist-release
+          pnpm --filter @x0c/tokens pack --pack-destination dist-release
+          pnpm --filter @x0c/ui pack --pack-destination dist-release
+          (cd dist-release && sha256sum x0c-tokens-*.tgz x0c-ui-*.tgz > SHA256SUMS)
+          ls -la dist-release
+          cat dist-release/SHA256SUMS
 
-      - name: Publish @x0c/tokens and @x0c/ui
+      - name: Upload tarballs to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: |
-          tokens_ver="$(node -p "require('./packages/tokens/package.json').version")"
-          ui_ver="$(node -p "require('./packages/ui/package.json').version")"
-
-          if npm view "@x0c/tokens@${tokens_ver}" version >/dev/null 2>&1; then
-            echo "skip @x0c/tokens@${tokens_ver} (already published)"
-          else
-            pnpm --filter @x0c/tokens publish --provenance --access public --no-git-checks
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --title "web-ui-kit ${RELEASE_TAG}" --generate-notes
           fi
-
-          for i in $(seq 1 24); do
-            if npm view "@x0c/tokens@${tokens_ver}" version >/dev/null 2>&1; then
-              break
-            fi
-            sleep 5
-          done
-
-          if npm view "@x0c/ui@${ui_ver}" version >/dev/null 2>&1; then
-            echo "skip @x0c/ui@${ui_ver} (already published)"
-          else
-            pnpm --filter @x0c/ui publish --provenance --access public --no-git-checks
-          fi
+          gh release upload "$RELEASE_TAG" dist-release/x0c-tokens-*.tgz dist-release/x0c-ui-*.tgz dist-release/SHA256SUMS --clobber

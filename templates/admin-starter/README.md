@@ -5,7 +5,7 @@ Quick-start template for a React 19 + Tailwind CSS v4 admin or developer console
 ## 1. Dependencies
 
 ```bash
-npm install react react-dom lucide-react @x0c/ui
+npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-ui-0.3.0.tgz
 npm install -D @tailwindcss/vite tailwindcss vite typescript @types/react @types/react-dom
 ```
 
