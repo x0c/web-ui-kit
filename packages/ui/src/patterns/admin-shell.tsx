@@ -30,6 +30,14 @@ export interface AdminUser {
   avatarUrl?: string
 }
 
+export interface CommandPaletteLabels {
+  trigger?: string
+  openLabel?: string
+  placeholder?: string
+  emptyLabel?: string
+  title?: string
+}
+
 export interface AdminShellProps {
   product: ReactNode
   brand?: ReactNode
@@ -44,13 +52,16 @@ export interface AdminShellProps {
   topbarActions?: ReactNode
   topbarExtra?: ReactNode
   user?: AdminUser | null
+  userMenuExtra?: ReactNode
   onSignOut?: () => void
   signOutLabel?: string
   accountMenuLabel?: string
   onBrandClick?: () => void
   brandHref?: string
   enableCommandPalette?: boolean
+  commandPaletteLabels?: CommandPaletteLabels
   extraCommands?: CommandAction[]
+  sidebarFooter?: ReactNode
   children: ReactNode
 }
 
@@ -63,6 +74,7 @@ export function AppTopbar({
   onBrandClick,
   brandHref = '/',
   user,
+  userMenuExtra,
   onSignOut,
   signOutLabel = 'Sign out',
   accountMenuLabel = 'Account menu',
@@ -76,6 +88,7 @@ export function AppTopbar({
   onBrandClick?: () => void
   brandHref?: string
   user?: AdminUser | null
+  userMenuExtra?: ReactNode
   onSignOut?: () => void
   signOutLabel?: string
   accountMenuLabel?: string
@@ -131,6 +144,7 @@ export function AppTopbar({
           {user && (
             <UserMenu
               user={user}
+              userMenuExtra={userMenuExtra}
               onSignOut={onSignOut}
               signOutLabel={signOutLabel}
               accountMenuLabel={accountMenuLabel}
@@ -144,11 +158,13 @@ export function AppTopbar({
 
 function UserMenu({
   user,
+  userMenuExtra,
   onSignOut,
   signOutLabel,
   accountMenuLabel,
 }: {
   user: AdminUser
+  userMenuExtra?: ReactNode
   onSignOut?: () => void
   signOutLabel: string
   accountMenuLabel: string
@@ -172,6 +188,12 @@ function UserMenu({
             <div className="truncate text-xs font-normal text-muted-foreground">{user.email}</div>
           </div>
         </DropdownMenuLabel>
+        {userMenuExtra && (
+          <>
+            <DropdownMenuSeparator />
+            {userMenuExtra}
+          </>
+        )}
         {onSignOut && (
           <>
             <DropdownMenuSeparator />
@@ -316,13 +338,16 @@ export function AdminShell({
   topbarActions,
   topbarExtra,
   user,
+  userMenuExtra,
   onSignOut,
   signOutLabel,
   accountMenuLabel,
   onBrandClick,
   brandHref,
   enableCommandPalette = false,
+  commandPaletteLabels,
   extraCommands = [],
+  sidebarFooter,
   children,
 }: AdminShellProps) {
   const [cmdOpen, setCmdOpen] = useState(false)
@@ -364,6 +389,7 @@ export function AdminShell({
         onBrandClick={onBrandClick}
         brandHref={brandHref}
         user={user}
+        userMenuExtra={userMenuExtra}
         onSignOut={onSignOut}
         signOutLabel={signOutLabel}
         accountMenuLabel={accountMenuLabel}
@@ -375,10 +401,10 @@ export function AdminShell({
             size="sm"
             onClick={() => setCmdOpen(true)}
             className="hidden h-8 gap-2 px-2.5 text-xs text-muted-foreground sm:inline-flex"
-            aria-label="Open command palette"
+            aria-label={commandPaletteLabels?.openLabel ?? 'Open command palette'}
           >
             <Search className="size-3.5" />
-            <span>Search</span>
+            <span>{commandPaletteLabels?.trigger ?? 'Search'}</span>
             <kbd className="rounded border border-border bg-muted px-1 py-0.2 font-mono text-[10px]">
               ⌘K
             </kbd>
@@ -389,7 +415,14 @@ export function AdminShell({
       </AppTopbar>
 
       {enableCommandPalette && (
-        <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} items={commandItems} />
+        <CommandPalette
+          open={cmdOpen}
+          onOpenChange={setCmdOpen}
+          items={commandItems}
+          placeholder={commandPaletteLabels?.placeholder}
+          emptyLabel={commandPaletteLabels?.emptyLabel}
+          title={commandPaletteLabels?.title}
+        />
       )}
 
       <MobileTabBar
@@ -439,6 +472,11 @@ export function AdminShell({
                 </div>
               </div>
             ))}
+            {sidebarFooter && (
+              <div className="mt-5 border-t border-border pt-3.5 text-xs text-muted-foreground">
+                {sidebarFooter}
+              </div>
+            )}
           </SideNav>
         }
       >
