@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   CatalogBadge,
+  Checkbox,
   type ColumnDef,
   ConfirmAction,
   CopyButton,
@@ -332,6 +333,52 @@ export function App() {
                 />
               }
             />
+
+            <Panel title="Buttons, Badges & Toggles">
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-2" data-testid="button-matrix">
+                  <Button variant="default">Default</Button>
+                  <Button variant="destructive">Destructive</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="secondary">Secondary</Button>
+                  <Button variant="ghost">Ghost</Button>
+                  <Button variant="link">Link</Button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2" data-testid="badge-matrix">
+                  <Badge variant="default">Default</Badge>
+                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="destructive">Destructive</Badge>
+                  <Badge variant="outline">Outline</Badge>
+                  <CatalogBadge source={STATUS_CATALOG} code="active" variant="pill" />
+                  <CatalogBadge source={STATUS_CATALOG} code="degraded" variant="tinted" />
+                  <CatalogBadge source={STATUS_CATALOG} code="unknown_enum_code" />
+                </div>
+                <div className="flex flex-wrap items-center gap-6" data-testid="toggle-matrix">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Switch id="pg-sw-on" checked aria-label="Switch On" />
+                    <label htmlFor="pg-sw-on">Switch On</label>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Switch id="pg-sw-off" checked={false} aria-label="Switch Off" />
+                    <label htmlFor="pg-sw-off">Switch Off</label>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Checkbox id="pg-cb-on" checked aria-label="Checked" />
+                    <label htmlFor="pg-cb-on">Checked</label>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Checkbox id="pg-cb-off" checked={false} aria-label="Unchecked" />
+                    <label htmlFor="pg-cb-off">Unchecked</label>
+                  </div>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2" data-testid="notice-matrix">
+                  <Notice tone="error">Error notice message</Notice>
+                  <Notice tone="warning">Warning notice message</Notice>
+                  <Notice tone="success">Success notice message</Notice>
+                  <Notice tone="info">Info notice message</Notice>
+                </div>
+              </div>
+            </Panel>
 
             <Panel title="Password & Catalog Badges">
               <div className="grid max-w-md gap-4">
