@@ -1,7 +1,7 @@
 import { Command } from 'cmdk'
 import type { LucideIcon } from 'lucide-react'
 import { Search } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { cn } from '../lib/utils'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../primitives/dialog'
 
@@ -33,16 +33,23 @@ export function CommandPalette({
   emptyLabel = 'No matching commands.',
   title = 'Command Palette',
 }: CommandPaletteProps) {
+  const stateRef = useRef({ open, onOpenChange })
+
+  useEffect(() => {
+    stateRef.current = { open, onOpenChange }
+  }, [open, onOpenChange])
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.isComposing || e.altKey) return
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
-        onOpenChange(!open)
+        stateRef.current.onOpenChange(!stateRef.current.open)
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [open, onOpenChange])
+  }, [])
 
   const groups = new Map<string, CommandAction[]>()
   for (const item of items) {

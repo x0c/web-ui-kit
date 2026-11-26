@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { cn, initials, safeImageURL } from '../lib/utils'
 
 export interface BrandMarkProps {
@@ -22,15 +23,17 @@ export function BrandMark({ size = 'sm', logoUrl, accentColor, label, className 
   }
 
   const hasCustomBrand =
-    accentColor &&
+    typeof accentColor === 'string' &&
     /^#[0-9a-fA-F]{6}$/.test(accentColor) &&
     accentColor.toLowerCase() !== '#2563eb'
 
   const glyph = label?.trim() ? initials(label, '') : ''
+  const customStyle = hasCustomBrand ? ({ '--brand': accentColor } as CSSProperties) : undefined
 
   return (
     <span
       aria-hidden
+      style={customStyle}
       className={cn(
         dims,
         'grid shrink-0 place-items-center font-semibold select-none',

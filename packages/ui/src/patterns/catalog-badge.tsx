@@ -73,8 +73,8 @@ export function CatalogBadge({
           className,
         )}
         style={{
-          borderColor: `${color}40`,
-          backgroundColor: `${color}14`,
+          borderColor: `color-mix(in srgb, ${color} 25%, transparent)`,
+          backgroundColor: `color-mix(in srgb, ${color} 8%, transparent)`,
           color,
         }}
       >

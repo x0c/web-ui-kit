@@ -32,6 +32,20 @@ export function buildOidcLoginHref(basePath: string, pathname?: string, search?:
   return `${basePath}${sep}return_to=${encodeURIComponent(sanitizeReturnTo(p, s))}`
 }
 
+function shouldAutoRedirect(storagePrefix: string, cooldownMs: number): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    const sp = new URLSearchParams(window.location.search)
+    if (sp.has('local') || sp.has('logged_out') || sp.has('error')) return false
+    if (sessionStorage.getItem(`${storagePrefix}_manual_logout`) === '1') return false
+    const rawTs = sessionStorage.getItem(`${storagePrefix}_auto_ts`)
+    if (rawTs && Date.now() - Number(rawTs) < cooldownMs) return false
+    return true
+  } catch {
+    return false
+  }
+}
+
 /**
  * Triggers zero-click OIDC redirect for unauthenticated console visits while guarding
  * against redirect loops (?logged_out=1, ?local=1, ?error=, manual sign-out flag, or 15s cooldown).
@@ -42,19 +56,7 @@ export function useOidcAutoRedirect({
   storagePrefix = 'x0c_oidc',
   cooldownMs = 15_000,
 }: OidcAutoRedirectOptions): boolean {
-  const [redirecting] = useState(() => {
-    if (!enabled || typeof window === 'undefined') return false
-    try {
-      const sp = new URLSearchParams(window.location.search)
-      if (sp.has('local') || sp.has('logged_out') || sp.has('error')) return false
-      if (sessionStorage.getItem(`${storagePrefix}_manual_logout`) === '1') return false
-      const rawTs = sessionStorage.getItem(`${storagePrefix}_auto_ts`)
-      if (rawTs && Date.now() - Number(rawTs) < cooldownMs) return false
-      return true
-    } catch {
-      return false
-    }
-  })
+  const redirecting = enabled && shouldAutoRedirect(storagePrefix, cooldownMs)
 
   useEffect(() => {
     if (!redirecting) return

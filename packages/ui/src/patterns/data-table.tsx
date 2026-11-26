@@ -192,16 +192,31 @@ export function DataTableToolbar({ className, ...props }: DataTableToolbarProps)
   return <FilterBar {...props} className={cn('border-b border-border px-4 py-3 sm:px-5', className)} />
 }
 
+export interface DataTablePaginationLabels {
+  emptyResults?: string
+  showing?: (start: number, end: number, total: number) => string
+  rowsPerPage?: string
+  pageOf?: (page: number, pageCount: number) => string
+  firstPage?: string
+  previousPage?: string
+  nextPage?: string
+  lastPage?: string
+}
+
 export interface DataTablePaginationProps<TData> {
   table: TanStackTable<TData>
   totalRows: number
+  loading?: boolean
   pageSizeOptions?: number[]
+  labels?: DataTablePaginationLabels
 }
 
 export function DataTablePagination<TData>({
   table,
   totalRows,
+  loading = false,
   pageSizeOptions = [10, 20, 50, 100],
+  labels,
 }: DataTablePaginationProps<TData>) {
   const { pageIndex, pageSize } = table.getState().pagination
   const pageCount = Math.max(1, table.getPageCount())
@@ -211,11 +226,19 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs text-muted-foreground sm:px-5">
       <div className="tabular">
-        {totalRows === 0 ? '0 results' : `Showing ${start}–${end} of ${totalRows}`}
+        {loading ? (
+          <Skeleton className="h-3.5 w-24" />
+        ) : totalRows === 0 ? (
+          (labels?.emptyResults ?? '0 results')
+        ) : labels?.showing ? (
+          labels.showing(start, end, totalRows)
+        ) : (
+          `Showing ${start}–${end} of ${totalRows}`
+        )}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="hidden sm:inline">Rows</span>
+          <span className="hidden sm:inline">{labels?.rowsPerPage ?? 'Rows'}</span>
           <Select
             value={String(pageSize)}
             onValueChange={(v) => {
@@ -237,7 +260,7 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <span className="tabular">
-          Page {pageIndex + 1} of {pageCount}
+          {labels?.pageOf ? labels.pageOf(pageIndex + 1, pageCount) : `Page ${pageIndex + 1} of ${pageCount}`}
         </span>
         <div className="flex items-center gap-1">
           <Button
@@ -246,7 +269,7 @@ export function DataTablePagination<TData>({
             size="icon-xs"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            aria-label="First page"
+            aria-label={labels?.firstPage ?? 'First page'}
           >
             <ChevronsLeft />
           </Button>
@@ -256,7 +279,7 @@ export function DataTablePagination<TData>({
             size="icon-xs"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            aria-label="Previous page"
+            aria-label={labels?.previousPage ?? 'Previous page'}
           >
             <ChevronLeft />
           </Button>
@@ -266,7 +289,7 @@ export function DataTablePagination<TData>({
             size="icon-xs"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            aria-label="Next page"
+            aria-label={labels?.nextPage ?? 'Next page'}
           >
             <ChevronRight />
           </Button>
@@ -276,7 +299,7 @@ export function DataTablePagination<TData>({
             size="icon-xs"
             onClick={() => table.setPageIndex(pageCount - 1)}
             disabled={!table.getCanNextPage()}
-            aria-label="Last page"
+            aria-label={labels?.lastPage ?? 'Last page'}
           >
             <ChevronsRight />
           </Button>
@@ -315,11 +338,15 @@ export interface DataTableProps<TData> {
   sorting?: SortingState
   onSortingChange?: OnChangeFn<SortingState>
   // Slots & behavior
+  paginationLabels?: DataTablePaginationLabels
+  skeletonRows?: number
   toolbarLeft?: ReactNode
   toolbarRight?: ReactNode
   onRowClick?: (row: TData) => void
   className?: string
 }
+
+const CELL_SKELETON_WIDTHS = ['w-24', 'w-32', 'w-20', 'w-16', 'w-28', 'w-14'] as const
 
 /**
  * Reusable Flat Monochrome DataTable backed by @tanstack/react-table.
@@ -350,6 +377,8 @@ export function DataTable<TData>({
   manualSorting = false,
   sorting: controlledSorting,
   onSortingChange,
+  paginationLabels,
+  skeletonRows = 5,
   toolbarLeft,
   toolbarRight,
   onRowClick,
@@ -433,13 +462,23 @@ export function DataTable<TData>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
+        <TableBody
+          aria-busy={loading || undefined}
+          className={cn(loading && rows.length > 0 && 'opacity-60 transition-opacity duration-150')}
+        >
           {loading && rows.length === 0 ? (
-            Array.from({ length: 4 }).map((_, idx) => (
-              <TableRow key={`sk-${idx}`}>
-                <TableCell colSpan={columns.length}>
-                  <Skeleton className="h-5 w-full" />
-                </TableCell>
+            Array.from({ length: skeletonRows }).map((_, idx) => (
+              <TableRow key={`sk-${idx}`} aria-hidden="true" className="hover:bg-transparent">
+                {table.getVisibleLeafColumns().map((col, colIdx) => (
+                  <TableCell key={col.id}>
+                    <Skeleton
+                      className={cn(
+                        'h-4',
+                        CELL_SKELETON_WIDTHS[(idx + colIdx) % CELL_SKELETON_WIDTHS.length],
+                      )}
+                    />
+                  </TableCell>
+                ))}
               </TableRow>
             ))
           ) : rows.length > 0 ? (
@@ -458,7 +497,7 @@ export function DataTable<TData>({
             ))
           ) : (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={columns.length} className="p-0">
+              <TableCell colSpan={Math.max(1, table.getVisibleLeafColumns().length)} className="p-0">
                 <EmptyRow icon={emptyIcon}>{emptyLabel}</EmptyRow>
               </TableCell>
             </TableRow>
@@ -466,7 +505,13 @@ export function DataTable<TData>({
         </TableBody>
       </Table>
 
-      <DataTablePagination table={table} totalRows={resolvedTotal} pageSizeOptions={pageSizeOptions} />
+      <DataTablePagination
+        table={table}
+        totalRows={resolvedTotal}
+        loading={loading && rows.length === 0}
+        pageSizeOptions={pageSizeOptions}
+        labels={paginationLabels}
+      />
     </div>
   )
 }

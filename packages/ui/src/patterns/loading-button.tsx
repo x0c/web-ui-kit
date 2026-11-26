@@ -11,7 +11,7 @@ export function LoadingButton({
 }: ComponentProps<typeof Button> & { pending?: boolean }) {
   return (
     <Button disabled={disabled || pending} aria-busy={pending || undefined} {...props}>
-      {pending && <Loader2 className="animate-spin" />}
+      {pending && <Loader2 aria-hidden="true" className="animate-spin motion-reduce:animate-none" />}
       {children}
     </Button>
   )

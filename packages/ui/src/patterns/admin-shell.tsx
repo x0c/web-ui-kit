@@ -294,6 +294,15 @@ export function SideNavSection({ children }: { children: ReactNode }) {
   )
 }
 
+function sideNavItemClassName(active?: boolean): string {
+  return cn(
+    'flex h-8.5 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-[13.5px] whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
+    active
+      ? 'bg-foreground/[0.065] font-medium text-foreground [&_svg]:text-foreground'
+      : 'font-normal text-muted-foreground hover:bg-foreground/[0.035] hover:text-foreground [&_svg]:text-muted-foreground/80',
+  )
+}
+
 export function SideNavItem({
   active,
   icon: Icon,
@@ -310,12 +319,7 @@ export function SideNavItem({
       type="button"
       aria-current={active ? 'page' : undefined}
       onClick={onClick}
-      className={cn(
-        'flex h-8.5 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-[13.5px] whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
-        active
-          ? 'bg-foreground/[0.065] font-medium text-foreground [&_svg]:text-foreground'
-          : 'font-normal text-muted-foreground hover:bg-foreground/[0.035] hover:text-foreground [&_svg]:text-muted-foreground/80',
-      )}
+      className={sideNavItemClassName(active)}
     >
       <Icon className="size-4" />
       {children}
@@ -443,12 +447,7 @@ export function AdminShell({
                   {sec.items.map((item) => {
                     const active = item.id === activeId
                     const Icon = item.icon
-                    const itemCls = cn(
-                      'flex h-8.5 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-[13.5px] whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
-                      active
-                        ? 'bg-foreground/[0.065] font-medium text-foreground [&_svg]:text-foreground'
-                        : 'font-normal text-muted-foreground hover:bg-foreground/[0.035] hover:text-foreground [&_svg]:text-muted-foreground/80',
-                    )
+                    const itemCls = sideNavItemClassName(active)
                     const content = (
                       <>
                         <Icon className="size-4" />
@@ -523,6 +522,7 @@ export function MetricStrip({
 }) {
   return (
     <div
+      aria-busy={loading || undefined}
       className={cn(
         'mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
         className,
@@ -532,7 +532,7 @@ export function MetricStrip({
         <div key={m.label} className="bg-card px-4 py-4 sm:px-5">
           <div className="text-xs font-medium text-muted-foreground">{m.label}</div>
           {loading ? (
-            <Skeleton className="mt-2 h-8 w-12" />
+            <Skeleton className="mt-1.5 h-[28px] w-14" />
           ) : (
             <div className="mt-1.5 text-[28px] leading-none font-semibold tracking-[-0.03em] tabular">
               {m.value ?? 0}
@@ -575,7 +575,12 @@ export function EditorialSection({
 /** Grouped entity container with 1px hairline dividers and no outer drop shadow. */
 export function InsetList({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('divide-y divide-border overflow-hidden rounded-lg border border-border bg-card', className)}>
+    <div
+      className={cn(
+        'divide-y divide-border overflow-hidden rounded-lg border border-border bg-card',
+        className,
+      )}
+    >
       {children}
     </div>
   )
@@ -624,6 +629,7 @@ export function Row({
 }) {
   return (
     <div
+      data-slot="row"
       className={cn(
         'flex min-h-[64px] items-center gap-3 border-b border-border px-4 py-2.5 last:border-b-0 sm:gap-3.5 sm:px-5',
         className,

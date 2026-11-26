@@ -7,5 +7,17 @@ export default defineConfig({
   build: {
     target: 'es2022',
     cssMinify: 'lightningcss',
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: 'react', test: /node_modules[\\/]react(-dom)?[\\/]/, priority: 30 },
+            { name: 'radix', test: /node_modules[\\/]radix-ui[\\/]/, priority: 25 },
+            { name: 'table', test: /node_modules[\\/]@tanstack[\\/]/, priority: 20 },
+            { name: 'icons', test: /node_modules[\\/]lucide-react[\\/]/, priority: 15 },
+          ],
+        },
+      },
+    },
   },
 })

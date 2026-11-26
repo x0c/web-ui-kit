@@ -1,5 +1,5 @@
 import { Check, Copy } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Button } from '../primitives/button'
 import { toast } from './toaster'
@@ -31,21 +31,33 @@ export function CopyButton({
   showLabel?: boolean
 }) {
   const [done, setDone] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current)
+    }
+  }, [])
+
   return (
     <Button
       type="button"
       variant="ghost"
       size={showLabel ? 'sm' : 'icon'}
       className={cn(!showLabel && 'size-8', className)}
-      aria-label={label}
+      aria-label={done ? copiedLabel : label}
       onClick={async () => {
         if (await copyText(value, copyFailedLabel)) {
           setDone(true)
-          setTimeout(() => setDone(false), 1400)
+          if (timerRef.current !== null) clearTimeout(timerRef.current)
+          timerRef.current = setTimeout(() => {
+            timerRef.current = null
+            setDone(false)
+          }, 1400)
         }
       }}
     >
-      {done ? <Check className="text-success" /> : <Copy />}
+      {done ? <Check aria-hidden="true" className="text-success" /> : <Copy aria-hidden="true" />}
       {showLabel && (done ? copiedLabel : label)}
     </Button>
   )

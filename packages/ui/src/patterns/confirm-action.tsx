@@ -48,11 +48,7 @@ export function ConfirmAction({
           <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
-            className={
-              destructive
-                ? 'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/30'
-                : undefined
-            }
+            variant={destructive ? 'destructive' : 'default'}
             onClick={async (e) => {
               e.preventDefault()
               setPending(true)
@@ -66,7 +62,7 @@ export function ConfirmAction({
               }
             }}
           >
-            {pending && <Loader2 className="animate-spin" />}
+            {pending && <Loader2 aria-hidden="true" className="animate-spin motion-reduce:animate-none" />}
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
