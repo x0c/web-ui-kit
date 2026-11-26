@@ -16,12 +16,16 @@ export function SecretDialog({
   warningLabel = 'This secret will only be shown once. Copy and store it now.',
   savedLabel = 'I have saved it',
   srDescription = 'One-time secret reveal',
+  copyLabel,
+  copyFailedLabel,
 }: {
   secret: SecretReveal | null
   onClose: () => void
   warningLabel?: string
   savedLabel?: string
   srDescription?: string
+  copyLabel?: string
+  copyFailedLabel?: string
 }) {
   return (
     <Dialog open={!!secret} onOpenChange={(v) => !v && onClose()}>
@@ -40,7 +44,7 @@ export function SecretDialog({
               <div className="mb-1.5 text-xs font-medium text-muted-foreground">{it.label}</div>
               <div className="flex items-center gap-2 rounded-md border border-dashed border-input bg-muted/50 py-1.5 pr-1.5 pl-3">
                 <code className="min-w-0 flex-1 font-mono text-[13px] break-all">{it.value}</code>
-                <CopyButton value={it.value} />
+                <CopyButton value={it.value} label={copyLabel} copyFailedLabel={copyFailedLabel} />
               </div>
             </div>
           ))}

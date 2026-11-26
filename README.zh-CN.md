@@ -19,14 +19,14 @@
 ## 安装
 
 ```bash
-npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-ui-0.3.0.tgz
+npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.2/x0c-ui-0.3.2.tgz
 npm install -D @tailwindcss/vite tailwindcss typescript
 ```
 
 若仅需 CSS Token 而不引入 React 原语：
 
 ```bash
-npm install https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-tokens-0.3.0.tgz
+npm install https://github.com/x0c/web-ui-kit/releases/download/v0.3.2/x0c-tokens-0.3.2.tgz
 ```
 
 ## 快速使用
@@ -72,6 +72,8 @@ export function App() {
 
 需要在 `product` 标题左侧展示自定义品牌标识时，向 `<AdminShell />` 传入 `brand={<MyBrandLockup />}` 即可；未传入时仅展示中性产品标题。
 
+使用 `SecretDialog` 展示一次性密钥时，可传入 `warningLabel`、`savedLabel`、`srDescription`、`copyLabel` 和 `copyFailedLabel` 提供本地化文案。关闭后的处理和各字段的标签仍由调用方负责。
+
 ## 支持的平台
 
 支持在 macOS、Linux 与 Windows 上的现代浏览器以及 React 19（`>= 19.0.0`）、Tailwind CSS v4（`>= 4.0.0`）、TypeScript / Vite 构建环境中使用。
@@ -87,6 +89,8 @@ pnpm run dev:playground
 ```
 
 安全上报与本地行为说明见 [SECURITY.md](SECURITY.md)，授权协议见 [MIT License](LICENSE)。
+
+构建诊断：`tsdown` 0.12 配合 Rolldown 1.3 会报告不支持的 `define` 选项，也会提示源文件中的 `use client` 指令可能无法保留到打包产物。v0.3.1 上同样出现这些警告；Vite 客户端构建和类型声明检查通过。当前未承诺支持 React Server Components，扩展支持前需复核打包配置。演示站的单一 JavaScript 包也超过了 Vite 的 500 kB 告警门槛，但演示站不打入组件包；规模增长或面向生产部署时按演示章节拆分。
 
 ## 关联工具
 

@@ -19,14 +19,14 @@ Flat Monochrome React 19, Radix UI, and Tailwind CSS v4 design tokens (`@x0c/tok
 ## Install
 
 ```bash
-npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-ui-0.3.0.tgz
+npm install react react-dom lucide-react https://github.com/x0c/web-ui-kit/releases/download/v0.3.2/x0c-ui-0.3.2.tgz
 npm install -D @tailwindcss/vite tailwindcss typescript
 ```
 
 For CSS-only tokens without React primitives:
 
 ```bash
-npm install https://github.com/x0c/web-ui-kit/releases/download/v0.3.0/x0c-tokens-0.3.0.tgz
+npm install https://github.com/x0c/web-ui-kit/releases/download/v0.3.2/x0c-tokens-0.3.2.tgz
 ```
 
 ## Usage
@@ -72,6 +72,8 @@ export function App() {
 
 Pass `brand={<MyBrandLockup />}` to `<AdminShell />` if you want a custom brand lockup before the `product` title, or wrap only `product` cleanly when omitted.
 
+For localized one-time secrets, pass `warningLabel`, `savedLabel`, `srDescription`, `copyLabel`, and `copyFailedLabel` to `SecretDialog`. The wrapping application owns the dismissal callback and each field's label.
+
 ## Supported Platforms
 
 Works in modern evergreen browsers with React 19 (`>= 19.0.0`), Tailwind CSS v4 (`>= 4.0.0`), and TypeScript/Vite toolchains on macOS, Linux, and Windows.
@@ -87,6 +89,8 @@ pnpm run dev:playground
 ```
 
 See [Security Policy](SECURITY.md) and [MIT License](LICENSE).
+
+Build diagnostics: `tsdown` 0.12 with Rolldown 1.3 reports an unsupported `define` option and warns that source-level `use client` directives may not survive bundling. These also occur on v0.3.1; Vite client builds and declaration checks pass. React Server Components are outside the supported scope; revisit the bundler integration before claiming that support. The playground's single JavaScript chunk also exceeds Vite's 500 kB warning threshold; it does not ship in either package. Split the playground by section if it grows or becomes a production entry point.
 
 ## Related Tools
 
