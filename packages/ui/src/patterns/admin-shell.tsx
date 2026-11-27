@@ -106,9 +106,9 @@ export function AppTopbar({
       />
     )
   ) : product ? (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex min-w-0 items-center gap-2">
       <BrandMark size="sm" accentColor={brandAccentColor} label={productLabel} />
-      <span className="text-sm font-semibold tracking-[-0.02em] text-foreground">{product}</span>
+      <span className="truncate text-sm font-semibold tracking-[-0.02em] text-foreground">{product}</span>
     </span>
   ) : (
     <BrandMark size="sm" accentColor={brandAccentColor} />
@@ -135,11 +135,11 @@ export function AppTopbar({
         )}
         {hasExplicitBrand && product && (
           <>
-            <span aria-hidden className="text-lg font-light text-border">/</span>
-            <div className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-muted-foreground">{product}</div>
+            <span aria-hidden className="shrink-0 text-lg font-light text-border">/</span>
+            <div className="flex min-w-0 items-center gap-1.5 truncate text-sm font-medium text-muted-foreground [&>*]:truncate">{product}</div>
           </>
         )}
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
           {children}
           {user && (
             <UserMenu
@@ -296,7 +296,7 @@ export function SideNavSection({ children }: { children: ReactNode }) {
 
 function sideNavItemClassName(active?: boolean): string {
   return cn(
-    'flex h-8.5 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-[13.5px] whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
+    'flex h-8.5 w-full min-w-0 shrink-0 cursor-pointer items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-left text-[13.5px] whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
     active
       ? 'bg-foreground/[0.065] font-medium text-foreground [&_svg]:text-foreground'
       : 'font-normal text-muted-foreground hover:bg-foreground/[0.035] hover:text-foreground [&_svg]:text-muted-foreground/80',
@@ -321,8 +321,8 @@ export function SideNavItem({
       onClick={onClick}
       className={sideNavItemClassName(active)}
     >
-      <Icon className="size-4" />
-      {children}
+      <Icon className="size-4 shrink-0" />
+      <span className="truncate">{children}</span>
     </button>
   )
 }
@@ -450,8 +450,8 @@ export function AdminShell({
                     const itemCls = sideNavItemClassName(active)
                     const content = (
                       <>
-                        <Icon className="size-4" />
-                        {item.label}
+                        <Icon className="size-4 shrink-0" />
+                        <span className="truncate">{item.label}</span>
                       </>
                     )
                     if (renderNavLink) {
@@ -500,7 +500,7 @@ export function PageHeader({
         <h1 className="text-[24px] leading-tight font-semibold tracking-[-0.025em]">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   )
 }
@@ -524,47 +524,62 @@ export function MetricStrip({
     <div
       aria-busy={loading || undefined}
       className={cn(
-        'mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
-        className,
+        'mb-8 overflow-hidden rounded-lg border border-border bg-card',
       )}
     >
-      {items.map((m) => (
-        <div key={m.label} className="bg-card px-4 py-4 sm:px-5">
-          <div className="text-xs font-medium text-muted-foreground">{m.label}</div>
-          {loading ? (
-            <Skeleton className="mt-1.5 h-[28px] w-14" />
-          ) : (
-            <div className="mt-1.5 text-[28px] leading-none font-semibold tracking-[-0.03em] tabular">
-              {m.value ?? 0}
-            </div>
-          )}
-        </div>
-      ))}
+      <div
+        className={cn(
+          '-mr-px -mb-px grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
+          className,
+        )}
+      >
+        {items.map((m) => (
+          <div key={m.label} className="min-w-0 border-r border-b border-border bg-card px-4 py-4 sm:px-5">
+            <div title={m.label} className="truncate text-xs font-medium text-muted-foreground">{m.label}</div>
+            {loading ? (
+              <Skeleton className="mt-1.5 h-[28px] w-14" />
+            ) : (
+              <div className="mt-1.5 truncate text-[28px] leading-none font-semibold tracking-[-0.03em] tabular">
+                {m.value ?? 0}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
-/** De-boxed editorial section: left-hand heading + optional action beside open content. */
+/** De-boxed editorial section: left-hand heading + inline badge/action beside open content. */
 export function EditorialSection({
   title,
+  badge,
   action,
   children,
   className,
 }: {
   title: ReactNode
+  badge?: ReactNode
   action?: ReactNode
   children: ReactNode
   className?: string
 }) {
   return (
     <section
+      data-slot="editorial-section"
       className={cn(
-        'grid gap-5 border-t border-border py-6 first-of-type:border-t-0 first-of-type:pt-1 sm:py-8 lg:grid-cols-[188px_minmax(0,1fr)] lg:gap-10',
+        'grid gap-5 border-t border-border py-6 first-of-type:border-t-0 first-of-type:pt-1 sm:py-8 lg:grid-cols-[204px_minmax(0,1fr)] lg:gap-10',
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-3 lg:flex-col lg:items-start lg:justify-start lg:pt-0.5">
-        <h2 className="text-sm font-semibold tracking-[-0.01em] text-foreground">{title}</h2>
+      <div
+        data-slot="editorial-section-header"
+        className="flex flex-wrap items-center justify-between gap-x-2.5 gap-y-2 lg:justify-start lg:self-start lg:pt-0.5"
+      >
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className="text-sm font-semibold tracking-[-0.01em] text-foreground">{title}</h2>
+          {badge && <div className="shrink-0">{badge}</div>}
+        </div>
         {action && <div className="shrink-0">{action}</div>}
       </div>
       <div className="min-w-0">{children}</div>
@@ -586,15 +601,17 @@ export function InsetList({ children, className }: { children: ReactNode; classN
   )
 }
 
-/** Bordered content section with a title row and optional trailing action. */
+/** Bordered content section with a title row and optional inline badge or trailing action. */
 export function Panel({
   title,
+  badge,
   action,
   children,
   className,
   flush,
 }: {
   title?: ReactNode
+  badge?: ReactNode
   action?: ReactNode
   children: ReactNode
   className?: string
@@ -602,10 +619,13 @@ export function Panel({
 }) {
   return (
     <section className={cn('mb-5 overflow-hidden rounded-lg border border-border bg-card', className)}>
-      {(title || action) && (
+      {(title || badge || action) && (
         <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2.5 sm:px-5">
-          <h2 className="text-sm font-semibold tracking-[-0.01em]">{title}</h2>
-          {action && <div className="flex items-center gap-2">{action}</div>}
+          <div className="flex min-w-0 items-center gap-2">
+            {title && <h2 className="truncate text-sm font-semibold tracking-[-0.01em]">{title}</h2>}
+            {badge && <div className="shrink-0">{badge}</div>}
+          </div>
+          {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
         </div>
       )}
       <div className={flush ? '' : 'p-4 sm:p-5'}>{children}</div>

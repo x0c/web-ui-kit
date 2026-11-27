@@ -28,7 +28,7 @@ export function FormField({
         <Label htmlFor={htmlFor} className="text-[13px] font-medium text-foreground/90">
           {label}
         </Label>
-        {trailing && <div className="text-[13px]">{trailing}</div>}
+        {trailing && <div className="shrink-0 text-[13px]">{trailing}</div>}
       </div>
       {children}
       {error ? (

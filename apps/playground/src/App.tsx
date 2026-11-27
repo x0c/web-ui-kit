@@ -9,6 +9,7 @@ import {
   ConfirmAction,
   CopyButton,
   DataTable,
+  EditorialSection,
   EmptyState,
   FormDialog,
   FormField,
@@ -245,7 +246,7 @@ export function App() {
               />
             </div>
 
-            <Panel title="Entities" action={<Badge variant="secondary">2 active</Badge>} flush>
+            <Panel title="Entities" badge={<Badge variant="secondary">2 active</Badge>} flush>
               <InsetList className="rounded-none border-0">
                 <Row
                   icon={<RowIcon><ShieldCheck /></RowIcon>}
@@ -276,6 +277,35 @@ export function App() {
                 />
               </InsetList>
             </Panel>
+
+            <EditorialSection title="已登录的设备" badge={<Badge variant="secondary">3</Badge>}>
+              <InsetList>
+                <Row
+                  icon={<RowIcon><Monitor /></RowIcon>}
+                  title="Safari · macOS"
+                  meta="47.82.x.x · 活跃于刚刚"
+                  actions={<Button size="sm" variant="outline">退出登录</Button>}
+                />
+              </InsetList>
+            </EditorialSection>
+
+            <EditorialSection
+              title="通行密钥"
+              action={
+                <Button size="sm" variant="outline">
+                  <Plus />
+                  添加
+                </Button>
+              }
+            >
+              <InsetList>
+                <Row
+                  icon={<RowIcon><KeyRound /></RowIcon>}
+                  title="MacBook Pro Touch ID"
+                  meta="id.caozc.com · 添加于 2026年11月24日"
+                />
+              </InsetList>
+            </EditorialSection>
           </>
         )}
 

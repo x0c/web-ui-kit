@@ -41,13 +41,15 @@ function HeaderSkeleton() {
 
 function MetricStripSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-4">
-      {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className="bg-card px-4 py-4 sm:px-5">
-          <Skeleton className="h-3.5 w-20" />
-          <Skeleton className="mt-2 h-[28px] w-14" />
-        </div>
-      ))}
+    <div className="mb-8 overflow-hidden rounded-lg border border-border bg-card">
+      <div className="-mr-px -mb-px grid grid-cols-2 sm:grid-cols-4">
+        {Array.from({ length: count }).map((_, idx) => (
+          <div key={idx} className="min-w-0 border-r border-b border-border bg-card px-4 py-4 sm:px-5">
+            <Skeleton className="h-3.5 w-20" />
+            <Skeleton className="mt-2 h-[28px] w-14" />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

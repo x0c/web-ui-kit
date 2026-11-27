@@ -225,7 +225,7 @@ export function DataTablePagination<TData>({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs text-muted-foreground sm:px-5">
-      <div className="tabular">
+      <div className="whitespace-nowrap tabular">
         {loading ? (
           <Skeleton className="h-3.5 w-24" />
         ) : totalRows === 0 ? (
@@ -259,7 +259,7 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <span className="tabular">
+        <span className="whitespace-nowrap tabular">
           {labels?.pageOf ? labels.pageOf(pageIndex + 1, pageCount) : `Page ${pageIndex + 1} of ${pageCount}`}
         </span>
         <div className="flex items-center gap-1">

@@ -119,12 +119,37 @@ try {
   await page.goto(URL, { waitUntil: 'networkidle' })
 
   let totalChecked = 0
+  const layoutFailures = []
   for (const mode of ['light', 'dark']) {
+    await page.setViewportSize({ width: 1280, height: 900 })
     await page.getByRole('button', { name: `Theme ${mode}` }).click()
     await page.waitForTimeout(100)
 
     await page.getByRole('button', { name: 'Overview' }).click()
     await page.waitForTimeout(80)
+
+    // Verify EditorialSection header title + badge/action stay inline (no unintended wrap)
+    const editorialChecks = await page.locator('[data-slot="editorial-section-header"]').evaluateAll((headers) =>
+      headers.map((h) => {
+        const title = h.querySelector('h2')
+        const extra = h.querySelector('[data-slot="badge"], button')
+        if (!title || !extra) return { ok: true }
+        const tr = title.getBoundingClientRect()
+        const er = extra.getBoundingClientRect()
+        const dy = Math.abs((tr.top + tr.bottom) / 2 - (er.top + er.bottom) / 2)
+        return {
+          title: title.textContent?.trim(),
+          extra: extra.textContent?.trim(),
+          dy: Number(dy.toFixed(1)),
+          ok: dy <= 4,
+        }
+      }),
+    )
+    for (const c of editorialChecks) {
+      totalChecked += 1
+      if (!c.ok) layoutFailures.push({ check: `editorial-inline:${mode}`, ...c })
+    }
+
     await page.getByRole('button', { name: 'Revoke' }).click()
     await page.waitForTimeout(120)
     const dialogAudit = await auditElements(page, '[data-slot="alert-dialog-content"] button', `confirm-dialog:${mode}`)
@@ -143,10 +168,30 @@ try {
     }
   }
 
+  // Mobile 390px single-line header & zero horizontal overflow check
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.getByRole('button', { name: 'Overview' }).click()
+  await page.waitForTimeout(100)
+  const mobileCheck = await page.evaluate(() => {
+    const header = document.querySelector('header')
+    return {
+      headerHeight: header ? Math.round(header.getBoundingClientRect().height) : 0,
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    }
+  })
+  totalChecked += 2
+  if (mobileCheck.headerHeight > 58) {
+    layoutFailures.push({ check: 'mobile-topbar-height', ...mobileCheck })
+  }
+  if (mobileCheck.scrollWidth > mobileCheck.innerWidth) {
+    layoutFailures.push({ check: 'mobile-horizontal-overflow', ...mobileCheck })
+  }
+
   await browser.close()
 
-  console.log(JSON.stringify({ totalChecked, failures, errors }, null, 2))
-  if (errors.length > 0 || failures.length > 0) {
+  console.log(JSON.stringify({ totalChecked, failures, layoutFailures, mobileCheck, errors }, null, 2))
+  if (errors.length > 0 || failures.length > 0 || layoutFailures.length > 0) {
     process.exitCode = 1
   }
 } finally {
