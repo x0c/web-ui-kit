@@ -7,7 +7,8 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "oxlint --deny-warnings packages/ui/src apps/playground/src",
     "dev:playground": "pnpm --filter @x0c/playground dev",
-    "build:playground": "pnpm --filter @x0c/playground build"
+    "build:playground": "pnpm --filter @x0c/playground build",
+    "verify:contrast": "node scripts/verify-contrast.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.5",
@@ -18,10 +19,10 @@
     "lightningcss": "^1.33.0",
     "lucide-react": "^1.78.0",
     "oxlint": "^1.90.0",
+    "playwright": "1.65.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwindcss": "^4.3.5",
-    "tsdown": "^0.12.0",
     "typescript": "~7.0.2",
     "vite": "^8.3.6"
   }

@@ -23,3 +23,6 @@ jobs:
       - run: pnpm run typecheck
       - run: pnpm run lint
       - run: pnpm run build:playground
+      - run: pnpm exec playwright install --with-deps chromium --only-shell
+      - run: pnpm run verify:contrast
+      - run: python3 -m unittest discover -s scripts -p 'test_*.py'

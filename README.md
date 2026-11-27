@@ -90,7 +90,7 @@ pnpm run dev:playground
 
 See [Security Policy](SECURITY.md) and [MIT License](LICENSE).
 
-Build diagnostics: `tsdown` 0.12 with Rolldown 1.3 reports an unsupported `define` option and warns that source-level `use client` directives may not survive bundling. These also occur on v0.3.1; Vite client builds and declaration checks pass. React Server Components are outside the supported scope; revisit the bundler integration before claiming that support. The playground's single JavaScript chunk also exceeds Vite's 500 kB warning threshold; it does not ship in either package. Split the playground by section if it grows or becomes a production entry point.
+To verify a candidate without publishing, run `python3 scripts/release.py --build-only --version v<package-version>`. It builds the Playground, checks contrast and narrow layouts in Chromium, installs the packed tarballs in an isolated consumer, and verifies React rendering and CSS exports. The release command requires matching package versions and never overwrites published assets. React Server Components remain outside the supported scope.
 
 ## Related Tools
 

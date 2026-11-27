@@ -106,10 +106,11 @@ async function auditElements(page, selector, label) {
 
 const errors = []
 const failures = []
+let browser
 
 try {
   await waitForServer()
-  const browser = await chromium.launch()
+  browser = await chromium.launch()
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(`console.error: ${msg.text()}`)
@@ -162,6 +163,9 @@ try {
     const badgeAudit = await auditElements(page, '[data-testid="badge-matrix"] > span', `badges:${mode}`)
     const noticeAudit = await auditElements(page, '[data-testid="notice-matrix"] > div', `notices:${mode}`)
 
+    for (const [group, results] of Object.entries({ dialogAudit, buttonAudit, badgeAudit, noticeAudit })) {
+      if (!results.length) throw new Error(`No elements checked in ${group} (${mode})`)
+    }
     for (const item of [...dialogAudit, ...buttonAudit, ...badgeAudit, ...noticeAudit]) {
       totalChecked += 1
       if (!item.passAA) failures.push(item)
@@ -181,19 +185,18 @@ try {
     }
   })
   totalChecked += 2
-  if (mobileCheck.headerHeight > 58) {
+  if (mobileCheck.headerHeight === 0 || mobileCheck.headerHeight > 58) {
     layoutFailures.push({ check: 'mobile-topbar-height', ...mobileCheck })
   }
   if (mobileCheck.scrollWidth > mobileCheck.innerWidth) {
     layoutFailures.push({ check: 'mobile-horizontal-overflow', ...mobileCheck })
   }
 
-  await browser.close()
-
   console.log(JSON.stringify({ totalChecked, failures, layoutFailures, mobileCheck, errors }, null, 2))
   if (errors.length > 0 || failures.length > 0 || layoutFailures.length > 0) {
     process.exitCode = 1
   }
 } finally {
+  await browser?.close()
   server.kill('SIGTERM')
 }

@@ -90,7 +90,7 @@ pnpm run dev:playground
 
 安全上报与本地行为说明见 [SECURITY.md](SECURITY.md)，授权协议见 [MIT License](LICENSE)。
 
-构建诊断：`tsdown` 0.12 配合 Rolldown 1.3 会报告不支持的 `define` 选项，也会提示源文件中的 `use client` 指令可能无法保留到打包产物。v0.3.1 上同样出现这些警告；Vite 客户端构建和类型声明检查通过。当前未承诺支持 React Server Components，扩展支持前需复核打包配置。演示站的单一 JavaScript 包也超过了 Vite 的 500 kB 告警门槛，但演示站不打入组件包；规模增长或面向生产部署时按演示章节拆分。
+如需只验证、不发布，运行 `python3 scripts/release.py --build-only --version v<包版本>`。命令会构建演示站，在 Chromium 中检查对比度和窄屏布局，再把实际压缩包安装到隔离的项目，验证 React 渲染和 CSS 导出。正式发布要求两个包的版本与标签一致，已有发布资源不会被覆盖。当前未承诺支持 React Server Components。
 
 ## 关联工具
 
